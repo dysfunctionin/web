@@ -1,1 +1,463 @@
-<h1>dysfunction</h1>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f4ec">
+<title>dysfunction</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3.5" fill="%2317140f"/></svg>'>
+<style>
+@font-face {
+  font-family: 'Aporetic Sans Mono';
+  src: url(data:font/woff2;base64,d09GMgABAAAAAAQMAA4AAAAAB6QAAAO6ACEFKwAAAAAAAAAAAAAAAAAAAAAAAAAAGhYbIBw2BmAAbBEICoVMhEIBNgIkAyALIAAEIAWDSgcgGwUGUZQwSivEVwe2IWo71Iswyeq4oTTWsc10urRtn5H3P3y2NEXgLR6Kuc+3m/wDYgdogVrWbIGVJ0fGkJB3rlNhAci1OVpr82LNVBCxfOr7h5REqoSmoZA5snt/NvFttC9iCXcyK/kuUi2qgtjzszSY+x8g3HlWingbtbb870ASC0V7JS3ikSgW2s+3u8QnIHa15BIaifqhUgq6yfTyhKgQp9cXfYBACyAFWoVAkxFplgOHzu/BrYRKQKDJiiF7Saf4uXRdhOKlBEoArushSNZqYiwuszVuqpF3Mm7AufHJavA2NKZaY4Fmd8BkJ44/XcKnCdvF/v9HZKOQBQKyIZ+BdHSBHjYBb7c7DXTxskkTCkoq2hZWtitJ2+rmv+Bu3bh2ac+u7YL9R4hK7QjtYAzoAJ7gLwaAHgBIhZhyRS7LYqS0SkP7Rj5BSFmzOLwQhbAzYTABJVOI8SKCEAb/OBy9PNHv5ARh+sjdy9HL08vDE+OSh7uHvcZ2IIECD8e+oaGmHAl08/CyH+KH1RBMBrvvCKHKNmcXR1sRJ9M2tjS3hcs3ZhZGWoCNrq/u7h6nyiZ7e2sbEWKa6vr6pjBGTGNtb+8kVTbe3V1dDxx0Q01PzwTGnuVddXWInSprr64GoGtqOvwQhhwy6Gflt0+uQbvB9OrExLSPv9d9sGC7oq7C2ZT2OidsXEdcw90Mmwtbu5uXmwJPgo6q9/jybk0J02ZdziGngQsRMsj2fQ+qgrvyzjrzuk470AmeTgwVPmr+S9oWWle5Px2aYKFpyVjCuiBSVJkxZvS03wTa6AZpm3dt5yQpIakkZ+13G6nxtlqitWQ3Jk6I+Jjdkhb5Iqa7dgfiLEVJYrIbuyxGWGLLsbsmRIiWZjU4D/MZUeQzUeQPmFTi++JTZARreS/sJZIDPHQktHlE10xLwB5xNBs8UIMnbj4VmKyp3H55FtS+9qehvXgPr5vq7tP+q28Ff17+9ZbKLpAgKPYrJYfZWgAFm1g4vhDZWgZmgPnfrPqjQ37taUj1C7THdxvhKbTFZo0S9c6yibIRN3O7w4x3d2rz2F3Y8V1blrlrjkT5ijozYW+PQvVKx2GwkKy+rp6RljD9bk1ZtyiyN2a49Dl4TRVGgGnL2kURiSgmStYJmYljbFCPFyi3Ia/UwF9Ba5PNSE29Q6XQU905hKw7GJnB5gsKhLltPmNDhNGbGmWVzhoYaOs78hFFZ+AatJbnL2QhCA2zgSi/ICtDh/6mnraptoHax0gtqZWxscCqtQIEAA==) format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url(data:font/woff2;base64,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) format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #f7f4ec;
+  touch-action: none;
+  -webkit-text-size-adjust: 100%;
+}
+#sky {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@supports (height: 100dvh) {
+  #sky { height: 100dvh; }
+}
+#word {
+  position: fixed;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(2.6rem, 8vw, 5.4rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #17140f;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+  z-index: 2;
+}
+#word span {
+  display: inline-block;
+  will-change: transform;
+}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<h1 id="word" aria-label="dysfunction">dysfunction</h1>
+<noscript><style>#sky{display:none}</style></noscript>
+<script>
+(function () {
+  'use strict';
+
+  var canvas = document.getElementById('sky');
+  var ctx = canvas.getContext('2d');
+  var word = document.getElementById('word');
+
+  var INK = '#17140f';
+  var RAMP = " .',:;-=+*#%@";      // light -> dark
+  var RL = RAMP.length - 1;
+
+  var W = 0, H = 0, DPR = 1;
+  var cols = 0, rows = 0, cellW = 8, cellH = 13, fontSize = 14;
+  var sun = { cx: 0, cy: 0, R: 0 };
+  var field = new Float32Array(0);
+  var rowChars = [];
+  var rowInk = [];
+  var loops = [];
+  var nextSpawn = 0.6, nextGiant = 13;
+  var wz = { x: 0, y: 0, r: 100 };
+  var letters = [];
+  var pointer = { x: 0, y: 0, active: false };
+  var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------------- noise ----------------
+  function hash2(x, y) {
+    var h = (x | 0) * 374761393 + (y | 0) * 668265263;
+    h = (h ^ (h >> 13)) * 1274126177;
+    h = h ^ (h >> 16);
+    return (h >>> 0) / 4294967296;
+  }
+  function vnoise(x, y) {
+    var xi = Math.floor(x), yi = Math.floor(y);
+    var xf = x - xi, yf = y - yi;
+    var u = xf * xf * (3 - 2 * xf);
+    var v = yf * yf * (3 - 2 * yf);
+    var a = hash2(xi, yi), b = hash2(xi + 1, yi);
+    var c = hash2(xi, yi + 1), d = hash2(xi + 1, yi + 1);
+    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+  }
+  function fbm2(x, y) {
+    return vnoise(x, y) * 0.65 + vnoise(x * 2.13 + 17.3, y * 2.13 + 9.1) * 0.35;
+  }
+  function noise1(x) { return vnoise(x, 3.7); }
+
+  // ---------------- layout ----------------
+  function setup() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.fillStyle = INK;
+    ctx.textBaseline = 'top';
+
+    fontSize = Math.max(6, Math.min(9, Math.round(Math.min(W, H) / 95)));
+    ctx.font = fontSize + 'px "Aporetic Sans Mono", monospace';
+    cellW = Math.max(2.5, ctx.measureText('@@@@@@@@@@').width / 10);
+    cellH = Math.max(4, Math.round(fontSize * 0.92));
+    cols = Math.ceil(W / cellW) + 1;
+    rows = Math.ceil(H / cellH) + 1;
+    field = new Float32Array(cols * rows);
+    rowChars = new Array(rows);
+    rowInk = new Array(rows);
+
+    sun.limbC = H * 0.70;                       // limb height at screen centre
+    sun.sag = Math.min(W * 0.11, H * 0.15);     // gentle arc drop at the edges
+    sun.Rc = Math.max(W * 0.5, (W * W) / (8 * sun.sag) + sun.sag / 2);
+    sun.cyc = sun.limbC + sun.Rc;               // true circle centre, far below screen
+
+    measureWord();
+  }
+
+  function measureWord() {
+    if (!letters.length) return;
+    var wr = word.getBoundingClientRect();
+    wz.x = wr.left + wr.width / 2;
+    wz.y = wr.top + wr.height / 2;
+    wz.r = Math.max(wr.width * 0.60, H * 0.17);
+    for (var i = 0; i < letters.length; i++) {
+      var r = letters[i].el.getBoundingClientRect();
+      letters[i].cx = r.left + r.width / 2;
+      letters[i].cy = r.top + r.height / 2;
+    }
+  }
+
+  function buildWord() {
+    var text = word.textContent;
+    word.textContent = '';
+    for (var i = 0; i < text.length; i++) {
+      var span = document.createElement('span');
+      span.textContent = text.charAt(i);
+      span.setAttribute('aria-hidden', 'true');
+      word.appendChild(span);
+      letters.push({ el: span, cx: 0, cy: 0, x: 0, y: 0 });
+    }
+  }
+
+  // ---------------- prominences ----------------
+  // limb height at a given x: the shallow top edge of a huge true circle
+  function limbY(x) {
+    var dx = x - W * 0.5;
+    var r = sun.Rc;
+    return sun.cyc - Math.sqrt(r * r - dx * dx);
+  }
+
+  function spawnLoop(giant, t) {
+    var margin = W * 0.05;
+    var span = giant ? W * 0.34 : W * 0.24;
+    var x1 = margin + Math.random() * (W - 2 * margin - span * 0.5);
+    var x2 = Math.min(x1 + span * (0.5 + Math.random() * 0.8), W - margin);
+    var apexH = giant ? H * (0.26 + Math.random() * 0.09) : H * (0.05 + Math.random() * 0.17);
+    loops.push({
+      x1: x1, x2: x2, apexH: apexH,
+      born: t, life: giant ? 17 + Math.random() * 7 : 8 + Math.random() * 8,
+      seed: Math.random() * 100,
+      speed: (0.3 + Math.random() * 0.55) * (Math.random() < 0.5 ? 1 : -1),
+      giant: giant
+    });
+  }
+
+  function maybeSpawn(t) {
+    if (t >= nextSpawn) {
+      var n = 0, i;
+      for (i = 0; i < loops.length; i++) if (!loops[i].giant) n++;
+      if (n < 7) spawnLoop(false, t);
+      nextSpawn = t + 1.1 + Math.random() * 2.1;
+    }
+    if (t >= nextGiant) {
+      spawnLoop(true, t);
+      nextGiant = t + 22 + Math.random() * 16;
+    }
+  }
+
+  function splat(px, py, b, sig2, kx, ky) {
+    var gx = Math.round(px / cellW), gy = Math.round(py / cellH);
+    for (var dy = -ky; dy <= ky; dy++) {
+      var yy = gy + dy;
+      if (yy < 0 || yy >= rows) continue;
+      var dpy = yy * cellH + cellH * 0.5 - py;
+      for (var dx = -kx; dx <= kx; dx++) {
+        var xx = gx + dx;
+        if (xx < 0 || xx >= cols) continue;
+        var dpx = xx * cellW + cellW * 0.5 - px;
+        var idx = yy * cols + xx;
+        field[idx] += b * Math.exp(-(dpx * dpx + dpy * dpy) / sig2);
+        if (field[idx] > 1.5) field[idx] = 1.5;
+      }
+    }
+  }
+
+  function splatLoops(t) {
+    var N = 42;
+    for (var i = loops.length - 1; i >= 0; i--) {
+      var L = loops[i];
+      var age = t - L.born;
+      if (age > L.life) { loops.splice(i, 1); continue; }
+      var grow = Math.min(1, age / 2.2);
+      var eg = grow * grow * (3 - 2 * grow);
+      var fade = 1 - Math.min(1, Math.max(0, (age - (L.life - 3)) / 3));
+      var env = eg * fade;
+      if (env <= 0.001) continue;
+
+      var f1x = L.x1, f1y = limbY(L.x1);
+      var f2x = L.x2, f2y = limbY(L.x2);
+      var ah = L.apexH * (0.25 + 0.75 * eg);
+      var ax = (L.x1 + L.x2) / 2;
+      var ay = limbY(ax) - ah;
+      var c1x = 2 * ax - 0.5 * (f1x + f2x);
+      var c1y = 2 * ay - 0.5 * (f1y + f2y);
+      var swayA = ah * 0.13;
+      var rad = (L.giant ? 1.9 : 1.55) * (cellW + cellH) * 0.5;
+      var sig2 = 2 * rad * 0.55 * rad * 0.55;
+      var kx = Math.ceil(rad * 1.6 / cellW);
+      var ky = Math.ceil(rad * 1.6 / cellH);
+
+      for (var j = 0; j <= N; j++) {
+        var u = j / N, iu = 1 - u;
+        var bx = iu * iu * f1x + 2 * iu * u * c1x + u * u * f2x;
+        var by = iu * iu * f1y + 2 * iu * u * c1y + u * u * f2y;
+        var tx2 = 2 * iu * (c1x - f1x) + 2 * u * (f2x - c1x);
+        var ty2 = 2 * iu * (c1y - f1y) + 2 * u * (f2y - c1y);
+        var tl = Math.sqrt(tx2 * tx2 + ty2 * ty2) || 1;
+        var nx = -ty2 / tl, ny = tx2 / tl;
+        var sway = Math.sin(Math.PI * u) * swayA * (noise1(u * 2.6 + L.seed * 7 + t * 0.5) - 0.5) * 2;
+        bx += nx * sway;
+        by += ny * sway;
+        var envU = Math.pow(Math.sin(Math.PI * u), 0.65);
+        var pk = noise1(u * 3.4 - t * L.speed + L.seed * 13.7);
+        var b = envU * (Math.max(0, pk - 0.34) * 3.2 * (L.giant ? 1.15 : 0.85) + 0.13) * env;
+        if (b < 0.05) continue;
+        splat(bx, by, b, sig2, kx, ky);
+      }
+
+      if (L.giant) {
+        var p0 = L.life * 0.55;
+        if (age > p0) {
+          var prog = Math.min(1, (age - p0) / (L.life - p0));
+          var bb = (1 - prog) * 0.95 * env;
+          if (bb > 0.05) {
+            var pr = rad * (1.8 + prog * 1.6);
+            splat(ax, ay - prog * H * 0.14, bb, 2 * pr * 0.6 * pr * 0.6,
+              Math.ceil(pr * 1.8 / cellW), Math.ceil(pr * 1.8 / cellH));
+          }
+        }
+      }
+    }
+  }
+
+  // ---------------- spicules (limb grass) ----------------
+  function spicules(t) {
+    var ti = Math.floor(t * 7);
+    for (var x = 0; x < cols; x++) {
+      var px = x * cellW + cellW * 0.5;
+      var h1 = hash2(x + 11, ti);
+      if (h1 >= 0.06) continue;
+      var h2 = hash2(x * 7 + 3, ti + 991);
+      var rowL = Math.floor(limbY(px) / cellH);
+      var len = 1 + ((h2 * 4) | 0);
+      var str = 0.3 + 0.45 * h2;
+      for (var k = 1; k <= len; k++) {
+        var row = rowL - k;
+        if (row < 0) break;
+        field[row * cols + x] += str * (1 - k / (len + 1));
+      }
+    }
+  }
+
+  // dim the plasma around the word so it stays pristine
+  function wordMask(px, py) {
+    var dx = px - wz.x, dy = (py - wz.y) * 1.4;
+    var d = Math.sqrt(dx * dx + dy * dy);
+    if (d >= wz.r) return 1;
+    var m = d / wz.r;
+    var s = m * m * (3 - 2 * m);
+    return 0.22 + 0.78 * s;
+  }
+
+  // ---------------- compose frame ----------------
+  function compose(t) {
+    field.fill(0);
+    maybeSpawn(t);
+    splatLoops(t);
+    spicules(t);
+
+    var gs = 0.016;                    // granulation scale
+    var tx = t * 0.06, ty = t * 0.04;  // granulation drift
+    var bandW = Math.max(10, H * 0.022);
+    var bandW2 = bandW * bandW;
+    var hazeW = H * 0.05;
+
+    for (var y = 0; y < rows; y++) {
+      var py = y * cellH + cellH * 0.5;
+      var line = '';
+      var ink = false;
+      var rowBase = y * cols;
+      for (var x = 0; x < cols; x++) {
+        var px = x * cellW + cellW * 0.5;
+        var ly = limbY(px);
+        var f = field[rowBase + x];
+        var v;
+        if (py >= ly) {
+          // inside the sun: churning granulation + bright limb core + depth glow
+          var near = py - ly;
+          var g = fbm2(px * gs + tx, py * gs - ty);
+          v = 0.34 + g * 0.52;
+          var band = Math.exp(-(near * near) / bandW2);
+          if (band > 0.03) {
+            var streak = fbm2(px * 0.02 + 31.7 + t * 0.06, py * 0.015 + 11.3 - t * 0.05);
+            v += band * (0.3 + streak * 0.9);
+          }
+          var depth = near / (H * 0.09);
+          if (depth > 1) depth = 1;
+          v += depth * 0.26;
+          v += f;
+        } else if (f > 0.004) {
+          // sky: faint fuzz above the limb + prominence plasma
+          var hv = Math.exp(-(ly - py) / (hazeW * 0.35)) * 0.16 *
+                   (0.35 + 0.65 * fbm2(px * 0.05 + tx * 2, py * 0.05 - ty));
+          v = hv + f * wordMask(px, py);
+        } else {
+          line += ' ';
+          continue;
+        }
+        if (v <= 0.001) { line += ' '; continue; }
+        if (v > 1) v = 1;
+        var ci = (Math.pow(v, 1.12) * RL + 0.5) | 0;
+        if (ci <= 0) { line += ' '; continue; }
+        if (ci > RL) ci = RL;
+        line += RAMP.charAt(ci);
+        ink = true;
+      }
+      rowChars[y] = line;
+      rowInk[y] = ink;
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+    for (var y = 0; y < rows; y++) {
+      if (rowInk[y]) ctx.fillText(rowChars[y], 0, y * cellH);
+    }
+  }
+
+  // ---------------- word lensing ----------------
+  function lens() {
+    var R0 = Math.max(130, W * 0.10);
+    for (var i = 0; i < letters.length; i++) {
+      var L = letters[i];
+      var txv = 0, tyv = 0;
+      if (pointer.active) {
+        var dx = pointer.x - L.cx, dy = pointer.y - L.cy;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < R0 && d > 0.01) {
+          var f = 1 - d / R0;
+          var push = f * f * 13;
+          txv = -(dx / d) * push;
+          tyv = -(dy / d) * push * 0.75;
+        }
+      }
+      L.x += (txv - L.x) * 0.14;
+      L.y += (tyv - L.y) * 0.14;
+      if (Math.abs(L.x) > 0.05 || Math.abs(L.y) > 0.05) {
+        L.el.style.transform = 'translate(' + L.x.toFixed(2) + 'px,' + L.y.toFixed(2) + 'px)';
+      } else if (L.el.style.transform) {
+        L.el.style.transform = '';
+      }
+    }
+  }
+
+  // ---------------- main loop ----------------
+  var t = 0, last = 0, acc = 0;
+  var STEP = 1000 / 30;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (!last) last = now;
+    var dt = now - last;
+    last = now;
+    if (dt > 250) dt = 250;
+    acc += dt;
+    if (acc < STEP) { lens(); return; }
+    t += acc / 1000;
+    acc = 0;
+    compose(t);
+    render();
+    lens();
+  }
+
+  // ---------------- events ----------------
+  var resizeTimer = 0;
+  function onResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      setup();
+      if (reduced) { compose(12); render(); }
+    }, 120);
+  }
+  window.addEventListener('resize', onResize);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', onResize);
+  }
+  window.addEventListener('orientationchange', onResize);
+  window.addEventListener('pointermove', function (e) {
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
+    pointer.active = true;
+  }, { passive: true });
+  window.addEventListener('pointerleave', function () { pointer.active = false; });
+  window.addEventListener('pointercancel', function () { pointer.active = false; });
+
+  // ---------------- init ----------------
+  buildWord();
+  setup();
+
+  if (reduced) {
+    compose(3); compose(6); compose(9);
+    render();
+  } else {
+    requestAnimationFrame(frame);
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      setup();
+      if (reduced) { compose(12); render(); }
+    });
+  }
+})();
+</script>
+</body>
+</html>
