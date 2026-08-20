@@ -87,7 +87,11 @@ html, body {
   var rowChars = [];
   var rowInk = [];
   var loops = [];
-  var nextSpawn = 0.6, nextGiant = 13;
+  var flares = [];
+  var micros = [];
+  var streamers = [];
+  var nextSpawn = 0.6, nextGiant = 12, nextFlare = 8, nextMicro = 1.0;
+  var flareT = 0;
   var wz = { x: 0, y: 0, r: 100 };
   var letters = [];
   var pointer = { x: 0, y: 0, active: false };
@@ -141,6 +145,18 @@ html, body {
     sun.cyc = sun.limbC + sun.Rc;               // true circle centre, far below screen
 
     measureWord();
+
+    streamers = [];
+    var sn = Math.max(14, Math.round(cols / 4));
+    for (var s = 0; s < sn; s++) {
+      streamers.push({
+        x: ((s + 0.5 + Math.random() * 0.5) / sn) * W,
+        len: H * (0.2 + Math.random() * 0.26),
+        amp: 0.1 + Math.random() * 0.1,
+        sway: Math.random() * 100,
+        seed: Math.random() * 50
+      });
+    }
   }
 
   function measureWord() {
@@ -168,7 +184,9 @@ html, body {
     }
   }
 
-  // ---------------- prominences ----------------
+  // ---------------- solar physics ----------------
+  function smooth(x) { return x * x * (3 - 2 * x); }
+
   // limb height at a given x: the shallow top edge of a huge true circle
   function limbY(x) {
     var dx = x - W * 0.5;
@@ -181,13 +199,42 @@ html, body {
     var span = giant ? W * 0.34 : W * 0.24;
     var x1 = margin + Math.random() * (W - 2 * margin - span * 0.5);
     var x2 = Math.min(x1 + span * (0.5 + Math.random() * 0.8), W - margin);
-    var apexH = giant ? H * (0.26 + Math.random() * 0.09) : H * (0.05 + Math.random() * 0.17);
+    var apexH = giant ? H * (0.28 + Math.random() * 0.1) : H * (0.05 + Math.random() * 0.17);
     loops.push({
       x1: x1, x2: x2, apexH: apexH,
-      born: t, life: giant ? 17 + Math.random() * 7 : 8 + Math.random() * 8,
+      born: t, life: giant ? 18 + Math.random() * 8 : 8 + Math.random() * 8,
       seed: Math.random() * 100,
       speed: (0.3 + Math.random() * 0.55) * (Math.random() < 0.5 ? 1 : -1),
       giant: giant
+    });
+  }
+
+  function spawnFlare(t) {
+    var margin = W * 0.08;
+    var span = W * (0.26 + Math.random() * 0.2);
+    var x1 = margin + Math.random() * Math.max(20, W - 2 * margin - span);
+    var x2 = Math.min(x1 + span, W - margin);
+    var big = Math.random() < 0.45;
+    flares.push({
+      x1: x1, x2: x2,
+      apexH: big ? H * (0.34 + Math.random() * 0.12) : H * (0.16 + Math.random() * 0.1),
+      born: t,
+      rise: 3.2 + Math.random() * 1.5,
+      peak: 4 + Math.random() * 3,
+      life: big ? 24 + Math.random() * 10 : 13 + Math.random() * 6,
+      K: big ? 13 : 9,
+      seed: Math.random() * 100,
+      big: big
+    });
+  }
+
+  function spawnMicro(t) {
+    micros.push({
+      x: W * 0.04 + Math.random() * W * 0.92,
+      h: H * (0.02 + Math.random() * 0.05),
+      born: t,
+      life: 1.2 + Math.random() * 2.0,
+      seed: Math.random() * 100
     });
   }
 
@@ -200,7 +247,15 @@ html, body {
     }
     if (t >= nextGiant) {
       spawnLoop(true, t);
-      nextGiant = t + 22 + Math.random() * 16;
+      nextGiant = t + 26 + Math.random() * 16;
+    }
+    if (t >= nextFlare) {
+      spawnFlare(t);
+      nextFlare = t + 26 + Math.random() * 16;
+    }
+    if (t >= nextMicro) {
+      spawnMicro(t);
+      nextMicro = t + 1.2 + Math.random() * 2.4;
     }
   }
 
@@ -222,7 +277,6 @@ html, body {
   }
 
   function splatLoops(t) {
-    var N = 42;
     for (var i = loops.length - 1; i >= 0; i--) {
       var L = loops[i];
       var age = t - L.born;
@@ -232,49 +286,233 @@ html, body {
       var fade = 1 - Math.min(1, Math.max(0, (age - (L.life - 3)) / 3));
       var env = eg * fade;
       if (env <= 0.001) continue;
+      drawLoop(L, t, env, eg, age);
+    }
+  }
 
-      var f1x = L.x1, f1y = limbY(L.x1);
-      var f2x = L.x2, f2y = limbY(L.x2);
-      var ah = L.apexH * (0.25 + 0.75 * eg);
-      var ax = (L.x1 + L.x2) / 2;
-      var ay = limbY(ax) - ah;
-      var c1x = 2 * ax - 0.5 * (f1x + f2x);
-      var c1y = 2 * ay - 0.5 * (f1y + f2y);
-      var swayA = ah * 0.13;
-      var rad = (L.giant ? 1.9 : 1.55) * (cellW + cellH) * 0.5;
+  // braided, threaded prominence: several meandering plasma strands on a coronal envelope
+  function drawLoop(L, t, env, eg, age) {
+    var f1x = L.x1, f1y = limbY(L.x1);
+    var f2x = L.x2, f2y = limbY(L.x2);
+    var ah = L.apexH * (0.25 + 0.75 * eg);
+    var ax = (L.x1 + L.x2) / 2;
+    var ay = limbY(ax) - ah;
+    var c1x = 2 * ax - 0.5 * (f1x + f2x);
+    var c1y = 2 * ay - 0.5 * (f1y + f2y);
+    var swayA = ah * 0.12;
+    var unit = (cellW + cellH) * 0.5;
+    var rad = (L.giant ? 1.8 : 1.5) * unit;
+    var sig2 = 2 * rad * 0.55 * rad * 0.55;
+    var kx = Math.ceil(rad * 1.6 / cellW);
+    var ky = Math.ceil(rad * 1.6 / cellH);
+    var N = 30;
+    var strandN = L.giant ? 5 : 3;
+    var gap = (L.giant ? 1.6 : 1.2) * unit * 0.8;
+
+    var pxs = [], pys = [], nxs = [], nys = [];
+    var j, u, iu, bx, by, tx2, ty2, tl, nx, ny, sway;
+    for (j = 0; j <= N; j++) {
+      u = j / N; iu = 1 - u;
+      bx = iu * iu * f1x + 2 * iu * u * c1x + u * u * f2x;
+      by = iu * iu * f1y + 2 * iu * u * c1y + u * u * f2y;
+      tx2 = 2 * iu * (c1x - f1x) + 2 * u * (f2x - c1x);
+      ty2 = 2 * iu * (c1y - f1y) + 2 * u * (f2y - c1y);
+      tl = Math.sqrt(tx2 * tx2 + ty2 * ty2) || 1;
+      nx = -ty2 / tl; ny = tx2 / tl;
+      sway = Math.sin(Math.PI * u) * swayA * (noise1(u * 2.6 + L.seed * 7 + t * 0.5) - 0.5) * 2;
+      pxs[j] = bx + nx * sway;
+      pys[j] = by + ny * sway;
+      nxs[j] = nx; nys[j] = ny;
+    }
+
+    for (j = 0; j <= N; j += 2) splat(pxs[j], pys[j], 0.06 * env, sig2 * 3.2, kx + 1, ky + 1);
+
+    for (var s = 0; s < strandN; s++) {
+      var off = (s - (strandN - 1) / 2) * gap;
+      var sseed = L.seed * 3.1 + s * 7.7;
+      for (j = 0; j <= N; j++) {
+        u = j / N;
+        var me = (noise1(u * 3.0 + sseed + t * 0.7) - 0.5) * 2.2 * unit;
+        var px = pxs[j] + nxs[j] * (off + me * 0.6);
+        var py = pys[j] + nys[j] * (off + me * 0.6);
+        var envU = Math.pow(Math.sin(Math.PI * u), 0.7);
+        var flow = noise1(u * 4.2 - t * L.speed + L.seed * 13.7 + s * 3.3);
+        var b = envU * (Math.max(0, flow - 0.3) * 3.4 * (L.giant ? 1.2 : 0.9) + 0.1) * env;
+        if (b < 0.045) continue;
+        splat(px, py, b, sig2, kx, ky);
+      }
+    }
+
+    if (L.giant) {
+      var p0 = L.life * 0.5;
+      if (age > p0) {
+        var prog = Math.min(1, (age - p0) / (L.life - p0));
+        var bb = (1 - prog) * 0.9 * env;
+        if (bb > 0.05) {
+          var pr = rad * (1.9 + prog * 2.0);
+          splat(ax, ay - prog * H * 0.16, bb, 2 * pr * 0.6 * pr * 0.6,
+            Math.ceil(pr * 1.8 / cellW), Math.ceil(pr * 1.8 / cellH));
+        }
+      }
+      if (age > L.life * 0.6) {
+        rainOnArcade(f1x, f1y, f2x, f2y, ax, ay, ah, t, L.seed,
+          (age - L.life * 0.6) / (L.life * 0.4));
+      }
+    }
+  }
+
+  // one bowed leg from foot (fx,fy) to apex
+  function legPoint(fx, fy, ax, ay, s, bowA) {
+    var x = fx + (ax - fx) * s;
+    var y = fy + (ay - fy) * s;
+    var dx = ax - fx, dy = ay - fy;
+    var tl = Math.sqrt(dx * dx + dy * dy) || 1;
+    var nx = -dy / tl, ny = dx / tl;
+    var bow = bowA * Math.sin(Math.PI * s);
+    return [x + nx * bow, y + ny * bow];
+  }
+
+  // post-flare arcade: cusped loops forming bottom-up, ribbon footpoints, flicker, plasmoid, rain
+  function drawFlares(t) {
+    for (var i = flares.length - 1; i >= 0; i--) {
+      var F = flares[i];
+      var age = t - F.born;
+      if (age > F.life) { flares.splice(i, 1); continue; }
+      var f1x = F.x1, f2x = F.x2;
+      var f1y = limbY(f1x), f2y = limbY(f2x);
+      var ax = (f1x + f2x) / 2;
+      var baseY = limbY(ax);
+      var unit = (cellW + cellH) * 0.5;
+      var rad = 1.6 * unit;
       var sig2 = 2 * rad * 0.55 * rad * 0.55;
-      var kx = Math.ceil(rad * 1.6 / cellW);
-      var ky = Math.ceil(rad * 1.6 / cellH);
+      var kx = Math.ceil(rad * 1.7 / cellW);
+      var ky = Math.ceil(rad * 1.7 / cellH);
 
-      for (var j = 0; j <= N; j++) {
-        var u = j / N, iu = 1 - u;
-        var bx = iu * iu * f1x + 2 * iu * u * c1x + u * u * f2x;
-        var by = iu * iu * f1y + 2 * iu * u * c1y + u * u * f2y;
-        var tx2 = 2 * iu * (c1x - f1x) + 2 * u * (f2x - c1x);
-        var ty2 = 2 * iu * (c1y - f1y) + 2 * u * (f2y - c1y);
-        var tl = Math.sqrt(tx2 * tx2 + ty2 * ty2) || 1;
-        var nx = -ty2 / tl, ny = tx2 / tl;
-        var sway = Math.sin(Math.PI * u) * swayA * (noise1(u * 2.6 + L.seed * 7 + t * 0.5) - 0.5) * 2;
-        bx += nx * sway;
-        by += ny * sway;
-        var envU = Math.pow(Math.sin(Math.PI * u), 0.65);
-        var pk = noise1(u * 3.4 - t * L.speed + L.seed * 13.7);
-        var b = envU * (Math.max(0, pk - 0.34) * 3.2 * (L.giant ? 1.15 : 0.85) + 0.13) * env;
-        if (b < 0.05) continue;
-        splat(bx, by, b, sig2, kx, ky);
+      var env;
+      if (age < F.rise) env = smooth(Math.min(1, age / F.rise));
+      else if (age < F.rise + F.peak) env = 1;
+      else env = 1 - Math.min(1, (age - F.rise - F.peak) / (F.life - F.rise - F.peak));
+      if (env <= 0.01) continue;
+
+      var flick = 1;
+      if (age > F.rise) {
+        var fk = noise1(t * 7 + F.seed * 9);
+        flick = 1 + Math.max(0, fk) * 0.9 * Math.min(1, (age - F.rise) / 2);
       }
 
-      if (L.giant) {
-        var p0 = L.life * 0.55;
-        if (age > p0) {
-          var prog = Math.min(1, (age - p0) / (L.life - p0));
-          var bb = (1 - prog) * 0.95 * env;
-          if (bb > 0.05) {
-            var pr = rad * (1.8 + prog * 1.6);
-            splat(ax, ay - prog * H * 0.14, bb, 2 * pr * 0.6 * pr * 0.6,
+      flareT += Math.min(1, age / 2) * env * (F.big ? 0.22 : 0.12) * flick * 0.5;
+
+      var ribbon = env * flick * (F.big ? 1.0 : 0.7);
+      var rrad = (F.x2 - F.x1) * 0.05 + unit;
+      var rsig = 2 * rrad * 0.7 * rrad * 0.7;
+      var rkx = Math.ceil(rrad * 1.8 / cellW), rky = Math.ceil(rrad * 1.8 / cellH);
+      splat(f1x, f1y - unit, ribbon * 0.9, rsig, rkx, rky);
+      splat(f2x, f2y - unit, ribbon * 0.9, rsig, rkx, rky);
+
+      var steps = Math.max(4, Math.round((F.x2 - F.x1) / cellW));
+      for (var s2 = 0; s2 <= steps; s2++) {
+        var px0 = f1x + (f2x - f1x) * (s2 / steps);
+        splat(px0, limbY(px0) + unit * 0.6, ribbon * 0.4, 2 * unit * 1.4 * unit * 1.4, 2, 2);
+      }
+
+      for (var l = 0; l < F.K; l++) {
+        var fi = F.K === 1 ? 0 : l / (F.K - 1);
+        var lp = (age - fi * F.rise) / (F.rise * 0.8);
+        if (lp <= 0) continue;
+        lp = Math.min(1, lp);
+        var lh = F.apexH * (0.3 + 0.7 * fi) * smooth(lp);
+        var ay2 = baseY - lh;
+        var bowA = lh * 0.12;
+        var speed = 0.8 + (F.seed % 1) * 0.5;
+        for (var j = 0; j <= 16; j++) {
+          var u = j / 16;
+          var p, s;
+          if (u <= 0.5) { s = u * 2; p = legPoint(f1x, f1y, ax, ay2, s, bowA); }
+          else { s = (u - 0.5) * 2; p = legPoint(f2x, f2y, ax, ay2, s, bowA); }
+          var pk = noise1(u * 5 + t * speed + F.seed + l * 9);
+          var envU = Math.pow(Math.sin(Math.PI * u), 0.8);
+          var b = envU * (0.16 + Math.max(0, pk - 0.35) * 2.6) * env * flick;
+          if (b < 0.05) continue;
+          splat(p[0], p[1], b, sig2, kx, ky);
+        }
+      }
+
+      if (F.big && age > F.rise + F.peak * 0.3) {
+        var pt = (age - F.rise - F.peak * 0.3) / F.peak;
+        if (pt < 1.3) {
+          var pb = Math.max(0, 1 - pt * 0.8) * env * flick;
+          if (pb > 0.05) {
+            var pr = rad * (2.0 + pt * 1.8);
+            splat(ax, baseY - F.apexH - pt * H * 0.12, pb, 2 * pr * 0.6 * pr * 0.6,
               Math.ceil(pr * 1.8 / cellW), Math.ceil(pr * 1.8 / cellH));
           }
         }
+      }
+
+      if (age > F.rise + F.peak && env < 0.9) {
+        rainOnArcade(f1x, f1y, f2x, f2y, ax, baseY - F.apexH * 0.8, F.apexH * 0.8,
+          t, F.seed, 1 - env);
+      }
+    }
+  }
+
+  // bright knots of coronal rain cascading down the loop legs
+  function rainOnArcade(f1x, f1y, f2x, f2y, ax, ay, lh, t, seed, amount) {
+    if (amount <= 0.02) return;
+    var unit = (cellW + cellH) * 0.5;
+    var rad = 0.9 * unit;
+    var sig2 = 2 * rad * 0.6 * rad * 0.6;
+    var kx = Math.ceil(rad * 1.8 / cellW);
+    var ky = Math.ceil(rad * 1.8 / cellH);
+    var nDrops = 1 + Math.round(amount * 9);
+    var bowA = lh * 0.12;
+    for (var j = 0; j < nDrops; j++) {
+      var ph = ((seed * 3.7 + j * 0.37) % 1);
+      var d = (t * (0.2 + ph * 0.1) + ph * 4) % 1;
+      var s, p;
+      if (d < 0.5) { s = 1 - d * 2; p = legPoint(f1x, f1y, ax, ay, s, bowA); }
+      else { s = (d - 0.5) * 2; p = legPoint(f2x, f2y, ax, ay, s, bowA); }
+      var b = 0.28 * (1 - Math.abs(d * 2 - 1)) * amount;
+      if (b < 0.04) continue;
+      splat(p[0], p[1], b, sig2, kx, ky);
+    }
+  }
+
+  function drawMicros(t) {
+    var unit = (cellW + cellH) * 0.5;
+    for (var i = micros.length - 1; i >= 0; i--) {
+      var M = micros[i];
+      var age = t - M.born;
+      if (age > M.life) { micros.splice(i, 1); continue; }
+      var r = age / M.life;
+      var env = Math.exp(-r * r * 4) * Math.min(1, age / 0.15) * 0.6;
+      if (env <= 0.02) continue;
+      var x = M.x, ly = limbY(x);
+      var y = ly - M.h * Math.sin(Math.PI * r);
+      var rad = unit * (0.8 + 0.5 * Math.sin(Math.PI * r));
+      splat(x, y, env, 2 * rad * 0.6 * rad * 0.6, Math.ceil(rad * 1.8 / cellW), Math.ceil(rad * 1.8 / cellH));
+      splat(x, ly + unit * 0.4, env * 0.5, 2 * rad * 1.4 * rad * 1.4, 2, 2);
+    }
+  }
+
+  // ---------------- streamers (corona rays) ----------------
+  function drawStreamers(t) {
+    for (var i = 0; i < streamers.length; i++) {
+      var S = streamers[i];
+      var x = S.x + Math.sin(t * 0.05 + S.seed) * cellW * 1.5;
+      var col = Math.round(x / cellW);
+      var rowL = Math.floor(limbY(x) / cellH);
+      var len = Math.round(S.len / cellH);
+      for (var k = 1; k <= len; k++) {
+        var row = rowL - k;
+        if (row < 0) break;
+        var dy = k / len;
+        var a = S.amp * (1 - dy) * (0.6 + 0.4 * Math.sin(t * 0.08 + S.sway + dy * 6));
+        if (a < 0.02) continue;
+        var idx = row * cols + col;
+        field[idx] += a;
+        if (col > 0) field[idx - 1] += a * 0.35;
+        if (col < cols - 1) field[idx + 1] += a * 0.35;
       }
     }
   }
@@ -311,8 +549,12 @@ html, body {
   // ---------------- compose frame ----------------
   function compose(t) {
     field.fill(0);
+    flareT = 0;
     maybeSpawn(t);
     splatLoops(t);
+    drawFlares(t);
+    drawMicros(t);
+    drawStreamers(t);
     spicules(t);
 
     var gs = 0.016;                    // granulation scale
@@ -332,10 +574,12 @@ html, body {
         var f = field[rowBase + x];
         var v;
         if (py >= ly) {
-          // inside the sun: churning granulation + bright limb core + depth glow
+          // inside the sun: granulation + convection cells + bright limb core + depth glow
           var near = py - ly;
           var g = fbm2(px * gs + tx, py * gs - ty);
           v = 0.34 + g * 0.52;
+          var cell = fbm2(px * 0.02 + 55.1, py * 0.02 - 11.7);
+          v += (cell - 0.5) * 0.16;
           var band = Math.exp(-(near * near) / bandW2);
           if (band > 0.03) {
             var streak = fbm2(px * 0.02 + 31.7 + t * 0.06, py * 0.015 + 11.3 - t * 0.05);
@@ -344,9 +588,10 @@ html, body {
           var depth = near / (H * 0.09);
           if (depth > 1) depth = 1;
           v += depth * 0.26;
+          v += flareT * 0.18;
           v += f;
         } else if (f > 0.004) {
-          // sky: faint fuzz above the limb + prominence plasma
+          // sky: faint fuzz above the limb + plasma
           var hv = Math.exp(-(ly - py) / (hazeW * 0.35)) * 0.16 *
                    (0.35 + 0.65 * fbm2(px * 0.05 + tx * 2, py * 0.05 - ty));
           v = hv + f * wordMask(px, py);
