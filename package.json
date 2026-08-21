@@ -1,0 +1,12 @@
+{
+  "name": "dysfunction-web",
+  "private": true,
+  "workspaces": [
+    "tactile"
+  ],
+  "scripts": {
+    "dev:tactile": "npm run dev --workspace tactile",
+    "build:tactile": "npm run build --workspace tactile",
+    "lint:tactile": "npm run lint --workspace tactile"
+  }
+}
