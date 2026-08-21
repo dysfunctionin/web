@@ -54,8 +54,10 @@ function PluginCard({ entry, onOpen }) {
   const Icon = iconFor(entry.type);
   return (
     <button className="plugin-card" onClick={onOpen}>
-      <span className={`store-icon type-${entry.type}`}><Icon size={27} stroke={1.4} /></span>
-      <span className="plugin-card-copy"><strong>{entry.name}</strong><small>{entry.description}</small></span>
+      <span className="plugin-top">
+        <span className={`store-icon type-${entry.type}`}><Icon size={27} stroke={1.4} /></span>
+        <span className="plugin-card-copy"><strong>{entry.name}</strong><small>{entry.description}</small></span>
+      </span>
       <span className="plugin-card-meta"><span>First party</span><i /> <span>v{entry.version}</span><i /> <span>{formatSize(entry)}</span></span>
     </button>
   );
@@ -118,7 +120,7 @@ export function Marketplace() {
 
   return (
     <main className="marketplace-page">
-      <header className="marketplace-hero"><span className="eyebrow">Tactile marketplace</span><h1>Bring the objects you need.</h1><p>First-party extensions keep the core small. Browse here, then install verified packages from inside Tactile.</p></header>
+      <header className="marketplace-hero"><h1>Bring the objects you need.</h1><p>First-party extensions keep the core small. Browse here, then install verified packages from inside Tactile.</p></header>
       <div className="marketplace-tools">
         <label className="store-search"><IconSearch size={19} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search objects" aria-label="Search marketplace" /></label>
         <div className="category-control" aria-label="Marketplace categories">{categories.map((item) => <button className={category === item ? "active" : ""} onClick={() => setCategory(item)} key={item}>{item}</button>)}</div>

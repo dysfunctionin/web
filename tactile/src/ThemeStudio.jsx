@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { IconDownload, IconFileUpload, IconPalette, IconRefresh } from "@tabler/icons-react";
+import { IconChevronDown, IconDownload, IconFileUpload, IconPalette, IconRefresh } from "@tabler/icons-react";
 import { downloadTheme, foundations, normalizeTheme, themeVariables } from "./themes.js";
 
 const colors = [
@@ -15,6 +15,35 @@ const dimensions = [
   ["cellRadius", "Tile radius", 0, 14], ["cellGap", "Tile gap", 0, 5],
   ["titleSize", "Title size", 17, 22], ["titleWeight", "Title weight", 400, 780],
 ];
+
+function Select({ value, options, onChange }) {
+  const [open, setOpen] = useState(false);
+  const current = options.find((option) => option.value === value);
+  return (
+    <div className="select">
+      <button type="button" className="select-trigger" onClick={() => setOpen((o) => !o)} aria-haspopup="listbox" aria-expanded={open}>
+        <span>{current ? current.label : "\u00A0"}</span>
+        <IconChevronDown size={15} className="select-chevron" />
+      </button>
+      {open ? (
+        <div className="select-menu" role="listbox">
+          {options.map((option) => (
+            <button
+              type="button"
+              key={option.value}
+              className={`select-option ${option.value === value ? "active" : ""}`}
+              role="option"
+              aria-selected={option.value === value}
+              onClick={() => { onChange(option.value); setOpen(false); }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function initialTheme() {
   try {
@@ -70,14 +99,14 @@ export function ThemeStudio() {
 
   return (
     <main className="studio-page">
-      <header className="page-intro"><span className="eyebrow">Theme studio</span><h1>Make the workspace feel like yours.</h1><p>Build a theme that imports directly into Tactile. The preview is a lightweight model, not the running app.</p></header>
+      <header className="page-intro"><h1>Make the workspace feel like yours.</h1><p>Build a theme that imports directly into Tactile. The preview is a lightweight model, not the running app.</p></header>
       <div className="studio-layout">
         <section className="theme-controls" aria-label="Theme controls">
           <div className="control-heading"><IconPalette /><div><strong>Theme details</strong><small>{message}</small></div></div>
           <label className="text-control"><span>Name</span><input value={theme.name} onChange={(event) => update({ name: event.target.value })} /></label>
           <label className="text-control"><span>Description</span><input value={theme.description} onChange={(event) => update({ description: event.target.value })} /></label>
-          <label className="text-control"><span>Foundation</span><select onChange={(event) => applyFoundation(event.target.value)} defaultValue="paper-public">{foundations.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>
-          <label className="text-control"><span>Appearance</span><select value={theme.tokens.colorScheme} onChange={(event) => updateToken("colorScheme", event.target.value)}><option value="light">Light</option><option value="dark">Dark</option></select></label>
+          <label className="text-control"><span>Foundation</span><Select value="paper-public" options={foundations.map((item) => ({ value: item.id, label: item.name }))} onChange={(id) => applyFoundation(id)} /></label>
+          <label className="text-control"><span>Appearance</span><Select value={theme.tokens.colorScheme} options={[{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} onChange={(value) => updateToken("colorScheme", value)} /></label>
           <fieldset><legend>Paper and ink</legend><div className="color-grid">{colors.map(([token, label]) => <label key={token}><input type="color" value={theme.tokens[token]} onChange={(event) => updateToken(token, event.target.value)} /><span>{label}</span><code>{theme.tokens[token]}</code></label>)}</div></fieldset>
           <fieldset><legend>Density and shape</legend><div className="range-grid">{dimensions.map(([token, label, min, max]) => <label key={token}><span>{label}</span><input type="range" min={min} max={max} value={theme.tokens[token]} onChange={(event) => updateToken(token, Number(event.target.value))} /><output>{theme.tokens[token]}</output></label>)}</div></fieldset>
           <div className="theme-actions">
